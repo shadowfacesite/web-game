@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "validate": "node tools/validate.mjs",
+    "map": "node tools/validate.mjs --map",
+    "plan": "node tools/plan.mjs",
+    "prebuild": "npm run validate && npm run plan",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
