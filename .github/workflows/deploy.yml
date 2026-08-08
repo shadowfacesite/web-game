@@ -29,6 +29,17 @@ jobs:
       # Без npm ci: файла package-lock.json в репозитории может ещё не быть.
       - run: npm install
 
+      # Планировка проверяется до сборки. Сломанная карта валит сборку,
+      # и в игру не попадает.
+      - name: Проверить планировку
+        run: node tools/validate.mjs
+
+      - name: Убедиться, что валидатор ловит ошибку
+        run: node tools/validate.mjs --selftest
+
+      - name: Карта проходимости в лог
+        run: node tools/validate.mjs --map 7
+
       - run: npm run build
 
       - uses: actions/configure-pages@v5
