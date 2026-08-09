@@ -7,14 +7,20 @@
     "dev": "vite",
     "validate": "node tools/validate.mjs",
     "map": "node tools/validate.mjs --map",
+    "blockout": "node tools/blockout.mjs",
+    "kit": "node tools/kit.mjs",
+    "kit:list": "node tools/kit.mjs --list",
     "plan": "node tools/plan.mjs",
-    "prebuild": "npm run validate && npm run plan",
+    "blender": "node tools/blender.mjs",
+    "check": "npm run validate && npm run blockout && npm run kit",
+    "prebuild": "npm run check && npm run plan",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "three": "^0.185.0"
+    "@babylonjs/core": "^7.54.0",
+    "@babylonjs/loaders": "^7.54.0"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

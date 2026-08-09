@@ -3,23 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>ЗАТОН</title>
+    <title>ЗАТОН · кит шаблонов</title>
   </head>
   <body>
-    <canvas id="view"></canvas>
+    <!-- Верхняя панель наполняется из ui.ts: гизмо, привязки, режимы карты. -->
+    <header id="toolbar"></header>
 
-    <!-- Отладочная строка. Живёт до Э10, потом убирается целиком. -->
-    <pre id="hud"></pre>
+    <main id="stage">
+      <canvas id="view"></canvas>
 
-    <!-- Захват мыши требует жеста пользователя. Без этого экрана его негде взять. -->
-    <div id="veil">
-      <p class="veil-title">Э0 — каркас</p>
-      <p class="veil-hint">
-        Щёлкни по экрану, чтобы захватить мышь<br />
-        WASD — идти &nbsp;·&nbsp; Shift — бежать &nbsp;·&nbsp; Esc — отпустить мышь<br />
-        <b>F9 — собрать отчёт о железе и скопировать в буфер</b>
-      </p>
-    </div>
+      <!-- Подписи — обычный DOM поверх холста. Так они читаются с любого
+           расстояния и рисуются тем же шрифтом, что и весь интерфейс. -->
+      <div id="labels"></div>
+
+      <div id="hud">
+        <span id="fps">— FPS</span>
+        <span id="count">предметов: 0</span>
+        <span class="hud-hint">колесо — приблизить · ЛКМ — вращать вид · ПКМ — сдвинуть</span>
+      </div>
+    </main>
+
+    <aside id="catalog" class="panel">
+      <h2 class="panel-title">Каталог</h2>
+    </aside>
+
+    <aside id="inspector" class="panel">
+      <h2 class="panel-title">Предмет</h2>
+    </aside>
 
     <div id="toast"></div>
 

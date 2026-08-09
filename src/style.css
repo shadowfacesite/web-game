@@ -1,20 +1,24 @@
-/* Оформление здесь только служебное. Всё, что видит игрок, — внутри сцены. */
+/* Оформление служебное. Всё, что увидит игрок, живёт внутри сцены.
+   Монохром и моноширинный шрифт выбраны нарочно: интерфейс не должен
+   спорить с картинкой, которую ты оцениваешь. */
 
 :root {
   color-scheme: dark;
   --ink: #cfcabf;
   --ink-dim: #6e6a63;
+  --ink-faint: #46433e;
   --void: #0b0b0c;
+  --panel: #131315;
+  --line: #26262a;
+  --hot: #c0a06a;
+  --danger: #a35c52;
+  --bar: 40px;
+  --side: 268px;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-html,
-body {
+html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -23,77 +27,254 @@ body {
   font: 12px/1.5 ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
 }
 
-#view {
-  display: block;
-  width: 100%;
-  height: 100%;
-  touch-action: none;
+body {
+  display: grid;
+  grid-template-columns: var(--side) 1fr var(--side);
+  grid-template-rows: var(--bar) 1fr;
+  grid-template-areas:
+    "bar bar bar"
+    "catalog stage inspector";
 }
 
-/* --- отладочная строка ------------------------------------------------- */
+/* --- верхняя панель ---------------------------------------------------- */
+
+#toolbar {
+  grid-area: bar;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.tool {
+  flex: none;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  font: inherit;
+  padding: 4px 9px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.tool:hover { color: var(--ink); border-color: var(--ink-faint); }
+.tool.on { color: var(--void); background: var(--hot); border-color: var(--hot); }
+
+.tool-label { flex: none; color: var(--ink-faint); padding-left: 6px; }
+
+.pick {
+  flex: none;
+  background: var(--void);
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+  font: inherit;
+  padding: 4px 6px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.sep { flex: none; width: 1px; height: 20px; background: var(--line); margin: 0 6px; }
+
+/* --- сцена -------------------------------------------------------------- */
+
+#stage { grid-area: stage; position: relative; overflow: hidden; }
+
+#view { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+
+#labels { position: absolute; inset: 0; pointer-events: none; }
+
+.label {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  color: var(--ink);
+  text-shadow: 0 1px 3px #000, 0 0 8px #000;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.label-big {
+  color: var(--hot);
+  letter-spacing: 0.22em;
+  font-size: 12px;
+  transform: translate(0, -100%);
+}
 
 #hud {
-  position: fixed;
-  top: 10px;
+  position: absolute;
   left: 12px;
-  white-space: pre;
-  color: var(--ink);
+  bottom: 10px;
+  display: flex;
+  gap: 16px;
+  color: var(--ink-dim);
   text-shadow: 0 1px 2px #000;
   pointer-events: none;
-  opacity: 0.85;
-  font: inherit;
 }
+.hud-hint { color: var(--ink-faint); }
 
-/* --- экран захвата мыши ------------------------------------------------ */
+/* --- боковые панели ----------------------------------------------------- */
 
-#veil {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  background: rgba(11, 11, 12, 0.82);
-  cursor: pointer;
-  user-select: none;
-  text-align: center;
-  padding: 24px;
+.panel {
+  background: var(--panel);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
 }
+#catalog { grid-area: catalog; border-right: 1px solid var(--line); }
+#inspector { grid-area: inspector; border-left: 1px solid var(--line); }
 
-#veil[hidden] {
-  display: none;
-}
-
-.veil-title {
-  font-size: 13px;
-  letter-spacing: 0.42em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-
-.veil-hint {
-  color: var(--ink-dim);
-  line-height: 2;
-}
-
-.veil-hint b {
-  color: var(--ink);
+.panel-title {
+  font-size: 11px;
   font-weight: normal;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-bottom: 8px;
 }
 
-/* --- всплывающее сообщение об отчёте ----------------------------------- */
+.panel::-webkit-scrollbar { width: 8px; }
+.panel::-webkit-scrollbar-thumb { background: var(--line); }
+
+/* --- каталог ------------------------------------------------------------ */
+
+.search {
+  width: 100%;
+  background: var(--void);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font: inherit;
+  padding: 5px 7px;
+  margin-bottom: 8px;
+  border-radius: 2px;
+}
+.search:focus { outline: none; border-color: var(--ink-faint); }
+
+.catalog-list { display: flex; flex-direction: column; gap: 1px; }
+
+.group {
+  color: var(--hot);
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 12px 0 4px;
+}
+
+.tpl {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-left: 2px solid var(--line);
+  color: var(--ink);
+  font: inherit;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+.tpl:hover { background: #1a1a1d; border-left-color: var(--hot); }
+
+.tpl-name { display: block; }
+.tpl-size { display: block; color: var(--ink-faint); font-size: 10px; }
+.tpl-note {
+  display: block;
+  color: var(--ink-dim);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty { color: var(--ink-faint); padding: 16px 0; }
+
+/* --- панель предмета ---------------------------------------------------- */
+
+.head { border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 4px; }
+.head-name { color: var(--hot); }
+.head-note { color: var(--ink-dim); font-size: 10px; padding-top: 3px; }
+.head-size { color: var(--ink-faint); font-size: 10px; padding-top: 4px; }
+
+.section {
+  color: var(--ink-faint);
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 14px 0 5px;
+}
+.section-note { color: var(--ink-faint); font-size: 10px; padding-bottom: 6px; }
+
+.row { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+.row-label { flex: 1; color: var(--ink-dim); }
+.row-unit { color: var(--ink-faint); width: 14px; }
+
+.num {
+  width: 74px;
+  background: var(--void);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font: inherit;
+  padding: 3px 5px;
+  text-align: right;
+  border-radius: 2px;
+}
+.num:focus { outline: none; border-color: var(--hot); }
+
+.row-slider { display: block; padding: 4px 0; }
+.row-top { display: flex; align-items: center; gap: 6px; }
+
+.range {
+  width: 100%;
+  margin-top: 3px;
+  accent-color: var(--hot);
+  background: transparent;
+}
+
+.quick { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 0; }
+
+.chip {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  font: inherit;
+  padding: 3px 8px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.chip:hover { color: var(--ink); border-color: var(--ink-faint); }
+.chip.danger:hover { color: var(--danger); border-color: var(--danger); }
+
+.foot { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 10px; }
+
+.hint { color: var(--ink-dim); white-space: pre-wrap; padding-top: 8px; }
+
+/* --- сообщение ---------------------------------------------------------- */
 
 #toast {
   position: fixed;
-  bottom: 16px;
-  left: 12px;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  max-width: 60vw;
+  background: #1c1c20;
+  border: 1px solid var(--line);
   color: var(--ink);
+  padding: 7px 14px;
+  border-radius: 2px;
   opacity: 0;
   transition: opacity 160ms linear;
   pointer-events: none;
 }
+#toast.on { opacity: 0.96; }
 
-#toast.on {
-  opacity: 0.9;
+/* Узкий экран: панели складываются под сцену. Редактор всё равно мышиный,
+   но хотя бы посмотреть можно. */
+@media (max-width: 1100px) {
+  body {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--bar) 1fr 200px 200px;
+    grid-template-areas: "bar" "stage" "catalog" "inspector";
+  }
+  #catalog { border-right: none; border-top: 1px solid var(--line); }
+  #inspector { border-left: none; border-top: 1px solid var(--line); }
 }
