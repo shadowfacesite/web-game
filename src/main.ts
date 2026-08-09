@@ -16,7 +16,7 @@ import { createEditor } from "./editor/editor.ts";
 import { installUI } from "./editor/ui.ts";
 import { layoutShowcase, layoutEmpty, buildHouseFromMap, createLabels } from "./editor/scenes.ts";
 import type { HouseView } from "./editor/scenes.ts";
-import { importGlb } from "./engine/importer.ts";
+import { importGlb, importFromUrl } from "./engine/importer.ts";
 
 const canvas = document.getElementById("view") as HTMLCanvasElement | null;
 if (!canvas) throw new Error("Нет <canvas id=\"view\"> в index.html");
@@ -74,10 +74,35 @@ function showHouse() {
 /* Панели и клавиши                                                    */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Карта, сделанная в Blender. Путь относительный — на GitHub Pages сайт
+ * живёт в подпапке с именем репозитория, и абсолютный там не найдётся.
+ */
+let fromBlender: { root: { dispose(): void } } | null = null;
+
+async function showGlb() {
+  if (fromBlender) { fromBlender.root.dispose(); fromBlender = null; }
+  dropHouse();
+  editor.clear();
+  labels.clear();
+  ui.toast("Читаю models/house.glb…");
+  try {
+    fromBlender = await importFromUrl(stage.scene, "models/", "house.glb");
+    stage.setGrid(false);
+    ui.toast("Карта из Blender загружена");
+  } catch {
+    // Файла может просто не быть — это нормальное состояние до первой
+    // выгрузки, и пугать сообщением об ошибке тут нечем.
+    stage.setGrid(true);
+    ui.toast("Нет public/models/house.glb — выгрузи карту из Blender (панель «Затон»)");
+  }
+}
+
 const ui = installUI(editor, {
   onShowcase: showShowcase,
   onEmpty: showEmpty,
   onHouse: showHouse,
+  onGlb: () => { void showGlb(); },
   onWalk: (on) => { stage.setWalk(on); labels.setVisible(!on); },
   walking: () => stage.walking,
 });

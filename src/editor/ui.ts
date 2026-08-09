@@ -30,6 +30,7 @@ export function installUI(editor: Editor, extras: {
   onShowcase(): void;
   onEmpty(): void;
   onHouse(): void;
+  onGlb(): void;
   onWalk(on: boolean): void;
   walking(): boolean;
 }) {
@@ -142,6 +143,7 @@ export function installUI(editor: Editor, extras: {
   button("Витрина", "Разложить все шаблоны по группам", extras.onShowcase);
   button("Пусто", "Очистить карту", extras.onEmpty);
   button("Дом", "Собрать дом из spec/house-map.json", extras.onHouse);
+  button("Карта .glb", "Загрузить public/models/house.glb, выгруженный из Blender", extras.onGlb);
 
   sep();
   const walkBtn = button("Ходить · Tab", "Пройтись по карте с высоты глаз", () => {
